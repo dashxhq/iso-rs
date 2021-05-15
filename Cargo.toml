@@ -1,0 +1,25 @@
+[package]
+name = "iso-rs"
+version = "0.1.0"
+authors = ["Daksh14 <41485688+Daksh14@users.noreply.github.com>"]
+edition = "2018"
+build = "build/build.rs"
+
+[dependencies]
+phf = "0.8.0"
+
+[build-dependencies]
+quote = "1.0"
+reqwest = { version = "0.11.3", features = ["blocking"] }
+proc-macro2 = "1.0.26"
+phf_codegen = "0.8.0"
+serde_json = "1.0"
+paste = "1.0.5"
+
+[features]
+default = ["all"]
+from_capitals = []
+from_alpha_2 = []
+from_alpha_3 = []
+from_regions = []
+all = ["from_capitals", "from_alpha_2", "from_alpha_3", "from_regions"]
