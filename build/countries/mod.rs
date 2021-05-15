@@ -87,7 +87,7 @@ pub fn get_countries() -> Result<TokenStream, Box<dyn Error>> {
     Ok(quote! {
         /// Map of all the countries with name as the key and value as [`Country`](struct.Country.html).
         pub static NAMES: phf::Map<&'static str, Country> = #names;
-        #[cfg(feature = "from_capital")]
+        #[cfg(feature = "from_capitals")]
         /// Map of all capitals with their countries as the value as an array of [`Country`](struct.Country.html).
         pub static CAPTIAL: phf::Map<&'static str, &'static [Country]> = #capital;
         #[cfg(feature = "from_regions")]
