@@ -1,8 +1,7 @@
 use crate::time::Timezones;
 use crate::{
     codegen::{
-        country_struct, currency_struct, language_struct, map_builder::MapBuilder, timezone_struct,
-        vec_to_string,
+        country_struct, currency_struct, language_struct, map_builder::MapBuilder, vec_to_string,
     },
     countries::country_data::CountryData,
     hash_map_to_static,

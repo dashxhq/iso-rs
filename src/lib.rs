@@ -32,7 +32,7 @@
 //! assert_eq!(country.capital.unwrap(), "New Delhi");
 //! ```
 //!
-
+use chrono_tz::Tz;
 /// Prelude brings the `Country`, `Currency` and `Language` structs in scope.
 pub mod prelude {
     pub use crate::{Country, Currency, Language};
@@ -88,8 +88,7 @@ pub struct Language {
 /// Represents a timezone with offset (UTC) and the IANA identifier
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
 pub struct Timezone {
-    // TODO: Find a way to convert second offset to UTC+H:M offset using chorno
-    // pub offset: &'static str,
+    /// IANA identifier for the timezone. For eg. Asia/Kolkata
     pub iana_identifier: &'static str,
 }
 
@@ -165,6 +164,13 @@ impl Country {
     #[cfg(feature = "from_alpha_3")]
     pub fn from_alpha_3(alpha_3: &str) -> Option<&'static [Self]> {
         ALPHA_3.get(alpha_3).map(|e| *e)
+    }
+}
+
+impl Timezone {
+    /// Get chrono_tz [timezone](https://docs.rs/chrono-tz/0.5.3/chrono_tz/enum.Tz.html)
+    pub fn timezone(&self) -> Result<Tz, String> {
+        self.iana_identifier.parse()
     }
 }
 
