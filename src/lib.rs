@@ -52,7 +52,7 @@ pub struct Country {
     /// 3166-1 3-letter country code
     pub alpha_3: &'static str,
     /// Timezones that country has in UTC, eg. `UTC-05:00` for columbia
-    pub timezones: &'static [&'static str],
+    pub timezones: &'static [Timezone],
     /// Currencies used in the country
     pub currencies: &'static [Currency],
     /// Languages used in the country
@@ -83,6 +83,14 @@ pub struct Language {
     pub name: Option<&'static str>,
     /// Native name of the language, can be in the native language
     pub native_name: Option<&'static str>,
+}
+
+/// Represents a timezone with offset (UTC) and the IANA identifier
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
+pub struct Timezone {
+    // TODO: Find a way to convert second offset to UTC+H:M offset using chorno
+    // pub offset: &'static str,
+    pub iana_identifier: &'static str,
 }
 
 // Generated code
@@ -170,7 +178,7 @@ mod test {
             assert_eq!($india.region.unwrap(), "Southern Asia");
             assert_eq!($india.alpha_2, "IN");
             assert_eq!($india.alpha_3, "IND");
-            assert_eq!($india.timezones[0], "UTC+05:30");
+            assert_eq!($india.timezones[0].iana_identifier, "Asia/Kolkata");
             assert_eq!($india.call_codes[0], "91");
             assert_eq!(
                 $india.currencies[0],

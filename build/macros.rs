@@ -53,6 +53,25 @@ macro_rules! vec_or_none {
             })
             .unwrap_or(Vec::new());
     };
+    // for generating timezone structs, convert the timezone json
+    // object to a valid rust struct
+    ( $key : expr, $country_data : expr, $timezone : expr ) => {
+        $country_data
+            .get($key)
+            .map(|value| {
+                if let Some(x) = value.as_array() {
+                    x.iter()
+                        .map(|k| timezone_struct(k, $timezone))
+                        .collect::<Vec<_>>()
+                } else {
+                    vec!["None"]
+                        .iter()
+                        .map(|k| k.to_string())
+                        .collect::<Vec<_>>()
+                }
+            })
+            .unwrap_or(Vec::new());
+    };
 }
 
 // Insert a value and convert it to String or insert a "None" String

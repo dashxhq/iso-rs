@@ -68,6 +68,16 @@ pub fn currency_struct(object: &Value) -> String {
     }
 }
 
+pub fn timezone_struct(offset: String, identifier: String) -> String {
+    let mut struct_string = String::from("Timezone {");
+    let mut struct_values = String::new();
+    // struct_values.push_str(format!(r#"offset: "{}","#, offset).as_str());
+    struct_values.push_str(format!(r#"iana_identifier: {},"#, identifier).as_str());
+    struct_string.push_str(&struct_values);
+    struct_string.push('}');
+    struct_string
+}
+
 pub fn language_struct(object: &Value) -> String {
     if let Some(languages) = object.as_object() {
         let mut struct_string = String::from("Language {");

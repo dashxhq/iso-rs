@@ -1,9 +1,13 @@
+use crate::time::Timezones;
 use crate::{
     codegen::{
-        country_struct, currency_struct, language_struct, map_builder::MapBuilder, vec_to_string,
+        country_struct, currency_struct, language_struct, map_builder::MapBuilder, timezone_struct,
+        vec_to_string,
     },
     countries::country_data::CountryData,
-    hash_map_to_static, value_or_none, vec_or_none,
+    hash_map_to_static,
+    time::timezone_vec,
+    value_or_none, vec_or_none,
 };
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -17,7 +21,7 @@ pub mod country_data;
 const COUNTRY_DATASET: &'static str = "https://restcountries.com/v2/all";
 type Regions<'a> = HashMap<&'a str, Vec<String>>;
 
-pub fn get_countries() -> Result<TokenStream, Box<dyn Error>> {
+pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>> {
     let data = get(COUNTRY_DATASET)?.text()?;
     let parsed: Value = from_str(data.as_str())?;
     let mut map = MapBuilder::new();
@@ -31,13 +35,19 @@ pub fn get_countries() -> Result<TokenStream, Box<dyn Error>> {
             if let Some(country_data) = country.as_object() {
                 let name = country_data.get("name");
                 if let Some(country_name) = name {
+                    let alpha_2 = value_or_none!("alpha2Code", country_data);
+                    let zone = timezones.get(&alpha_2);
                     vec.push(CountryData::new(
                         country_name.to_string(),
                         value_or_none!("capital", country_data),
                         value_or_none!("region", country_data),
-                        value_or_none!("alpha2Code", country_data),
+                        alpha_2,
                         value_or_none!("alpha3Code", country_data),
-                        vec_or_none!("timezones", country_data),
+                        timezone_vec(
+                            zone.map(|e| e.clone())
+                                .unwrap_or_else(|| Vec::new())
+                                .to_vec(),
+                        ),
                         vec_or_none!("currencies", country_data, currencies),
                         vec_or_none!("languages", country_data, languages),
                         vec_or_none!("callingCodes", country_data),
