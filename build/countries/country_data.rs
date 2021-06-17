@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct CountryData {
     pub name: String,
     pub capital: String,

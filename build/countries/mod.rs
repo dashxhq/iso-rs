@@ -13,18 +13,19 @@ use quote::quote;
 use reqwest::blocking::get;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
+
 use std::error::Error;
 
 pub mod country_data;
 
-const COUNTRY_DATASET: &'static str = "https://restcountries.com/v2/all";
+const COUNTRY_DATASET: &str = "https://restcountries.com/v2/all";
 type Regions<'a> = HashMap<&'a str, Vec<String>>;
 
 pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>> {
     let data = get(COUNTRY_DATASET)?.text()?;
     let parsed: Value = from_str(data.as_str())?;
     let mut map = MapBuilder::new();
-    let mut vec = Vec::new();
+    let mut vec: Vec<CountryData> = Vec::new();
     let mut regions: Regions = HashMap::new();
     let mut capitals: Regions = HashMap::new();
     let mut alpha_2: Regions = HashMap::new();
@@ -34,23 +35,23 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
             if let Some(country_data) = country.as_object() {
                 let name = country_data.get("name");
                 if let Some(country_name) = name {
-                    let alpha_2 = value_or_none!("alpha2Code", country_data);
-                    let zone = timezones.get(&alpha_2);
-                    vec.push(CountryData::new(
-                        country_name.to_string(),
-                        value_or_none!("capital", country_data),
-                        value_or_none!("region", country_data),
-                        alpha_2,
-                        value_or_none!("alpha3Code", country_data),
-                        timezone_vec(
-                            zone.map(|e| e.clone())
-                                .unwrap_or_else(|| Vec::new())
-                                .to_vec(),
-                        ),
-                        vec_or_none!("currencies", country_data, currencies),
-                        vec_or_none!("languages", country_data, languages),
-                        vec_or_none!("callingCodes", country_data),
-                    ));
+                    if !vec.iter().any(|data| {
+                        data.name.trim_matches('\"') == country_name.to_string().trim_matches('\"')
+                    }) {
+                        let alpha_2 = value_or_none!("alpha2Code", country_data);
+                        let zone = timezones.get(&alpha_2);
+                        vec.push(CountryData::new(
+                            country_name.to_string(),
+                            value_or_none!("capital", country_data),
+                            value_or_none!("region", country_data),
+                            alpha_2,
+                            value_or_none!("alpha3Code", country_data),
+                            timezone_vec(zone.cloned().unwrap_or_else(Vec::new).to_vec()),
+                            vec_or_none!("currencies", country_data, currencies),
+                            vec_or_none!("languages", country_data, languages),
+                            vec_or_none!("callingCodes", country_data),
+                        ));
+                    }
                 };
             }
         }
