@@ -12,11 +12,12 @@ mod macros;
 mod time;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let path = Path::new(&env::var_os("OUT_DIR").unwrap()).join("codegen.rs");
+    let mut file = BufWriter::new(File::create(&path).unwrap());
+
     if std::env::var("DOCS_RS").is_ok() {
         return Ok(());
     }
-    let path = Path::new(&env::var_os("OUT_DIR").unwrap()).join("codegen.rs");
-    let mut file = BufWriter::new(File::create(&path).unwrap());
 
     file.write(
         countries::get_countries(time::get_time()?)?
