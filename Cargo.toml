@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Daksh14 <41485688+Daksh14@users.noreply.github.com>"]
 edition = "2018"
 build = "build/build.rs"
+description = "A crate to query ISO data, which includes countries, currencies, etc."
+license = "MIT"
 
 [dependencies]
 phf = "0.8.0"
