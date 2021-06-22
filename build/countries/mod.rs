@@ -10,26 +10,30 @@ use crate::{
 };
 use proc_macro2::TokenStream;
 use quote::quote;
-use reqwest::blocking::get;
+
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
 
 use std::error::Error;
+use std::fs::File;
+use std::io::Read;
 
 pub mod country_data;
 
-const COUNTRY_DATASET: &str = "https://restcountries.com/v2/all";
-type Regions<'a> = HashMap<&'a str, Vec<String>>;
+type ItemsMap<'a> = HashMap<&'a str, Vec<String>>;
 
 pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>> {
-    let data = get(COUNTRY_DATASET)?.text()?;
+    let mut countries =
+        File::open(concat!(env!("CARGO_MANIFEST_DIR"), "/build/countries.json")).unwrap();
+    let mut data = String::new();
+    countries.read_to_string(&mut data).unwrap();
     let parsed: Value = from_str(data.as_str())?;
     let mut map = MapBuilder::new();
     let mut vec: Vec<CountryData> = Vec::new();
-    let mut regions: Regions = HashMap::new();
-    let mut capitals: Regions = HashMap::new();
-    let mut alpha_2: Regions = HashMap::new();
-    let mut alpha_3: Regions = HashMap::new();
+    let mut regions: ItemsMap = HashMap::new();
+    let mut capitals: ItemsMap = HashMap::new();
+    let mut alpha_2: ItemsMap = HashMap::new();
+    let mut alpha_3: ItemsMap = HashMap::new();
     if let Some(x) = parsed.as_array() {
         for country in x.iter() {
             if let Some(country_data) = country.as_object() {
@@ -87,12 +91,12 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
     hash_map_to_static!(alpha_2, map, alpha_2);
     hash_map_to_static!(alpha_3, map, alpha_3);
 
-    let parsed = map.parse()?;
-    let names = parsed.name;
-    let capital = parsed.capital;
-    let regions = parsed.region;
-    let alpha_2 = parsed.alpha_2;
-    let alpha_3 = parsed.alpha_3;
+    let parsed_map = map.parse()?;
+    let names = parsed_map.name;
+    let capital = parsed_map.capital;
+    let regions = parsed_map.region;
+    let alpha_2 = parsed_map.alpha_2;
+    let alpha_3 = parsed_map.alpha_3;
 
     Ok(quote! {
         /// Map of all the countries with name as the key and value as [`Country`](struct.Country.html).

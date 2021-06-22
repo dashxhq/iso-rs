@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    file.write(
+    file.write_all(
         countries::get_countries(time::get_time()?)?
             .to_string()
             .as_bytes(),

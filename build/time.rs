@@ -1,19 +1,18 @@
 use crate::codegen::*;
-use reqwest::blocking::get;
 use serde_json::{from_str, Value};
+
 use std::collections::HashMap;
 use std::error::Error;
-
-const API_KEY: &'static str = "0JJCCBNXW8K7";
+use std::fs::File;
+use std::io::Read;
 
 pub type Timezones = HashMap<String, Vec<String>>;
 
 pub fn get_time() -> Result<Timezones, Box<dyn Error>> {
-    let url = format!(
-        "http://api.timezonedb.com/v2.1/list-time-zone?key={}&format=json",
-        API_KEY
-    );
-    let data = get(url)?.text()?;
+    let mut timezones =
+        File::open(concat!(env!("CARGO_MANIFEST_DIR"), "/build/timezones.json")).unwrap();
+    let mut data = String::new();
+    timezones.read_to_string(&mut data).unwrap();
     let mut map: Timezones = HashMap::new();
     let parsed: Value = from_str(data.as_str())?;
     if let Some(zones) = parsed.get("zones") {

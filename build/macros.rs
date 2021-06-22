@@ -108,6 +108,8 @@ macro_rules! field_entry {
             .replace("null", "None")
             .as_str()
             .replace("Some(None)", "None")
+            .as_str()
+            .replace("(none)", "None")
             .as_str(),
         );
     };
