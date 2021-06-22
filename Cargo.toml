@@ -1,6 +1,6 @@
 [package]
 name = "iso-rs"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Daksh14 <41485688+Daksh14@users.noreply.github.com>"]
 edition = "2018"
 build = "build/build.rs"
