@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             .as_bytes(),
     )?;
 
-    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=build/build.rs");
 
     Ok(())
 }
