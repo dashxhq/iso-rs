@@ -17,7 +17,7 @@ macro_rules! vec_or_none {
                         .collect::<Vec<_>>()
                 }
             })
-            .unwrap_or(Vec::new());
+            .unwrap_or(Vec::new())
     };
     // for generating currencies structs, convert the currencies json
     // object to a valid rust struct
@@ -34,7 +34,7 @@ macro_rules! vec_or_none {
                         .collect::<Vec<_>>()
                 }
             })
-            .unwrap_or(Vec::new());
+            .unwrap_or(Vec::new())
     };
     // for generating language structs, convert the language json
     // object to a valid rust struct
@@ -51,7 +51,7 @@ macro_rules! vec_or_none {
                         .collect::<Vec<_>>()
                 }
             })
-            .unwrap_or(Vec::new());
+            .unwrap_or(Vec::new())
     };
     // for generating timezone structs, convert the timezone json
     // object to a valid rust struct
@@ -81,7 +81,7 @@ macro_rules! value_or_none {
         $country_data
             .get($key)
             .map(|value| value.to_string())
-            .unwrap_or(String::from("None"));
+            .unwrap_or(String::from("None"))
     };
 }
 
@@ -89,7 +89,7 @@ macro_rules! value_or_none {
 #[macro_export]
 macro_rules! tokens {
     ( $variable : expr  ) => {
-        TokenStream::from_str(&$variable.build().to_string())?;
+        TokenStream::from_str(&$variable.build().to_string())?
     };
 }
 
