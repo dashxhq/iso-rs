@@ -32,7 +32,8 @@
 //! assert_eq!(country.capital.unwrap(), "New Delhi");
 //! ```
 //!
-use chrono_tz::Tz;
+use chrono_tz::{ParseError, Tz};
+
 /// Prelude brings the `Country`, `Currency` and `Language` structs in scope.
 pub mod prelude {
     pub use crate::{Country, Currency, Language};
@@ -169,7 +170,7 @@ impl Country {
 
 impl Timezone {
     /// Get chrono_tz [timezone](https://docs.rs/chrono-tz/0.5.3/chrono_tz/enum.Tz.html)
-    pub fn timezone(&self) -> Result<Tz, String> {
+    pub fn timezone(&self) -> Result<Tz, ParseError> {
         self.iana_identifier.parse()
     }
 }
