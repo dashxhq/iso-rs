@@ -44,17 +44,21 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
                     }) {
                         let alpha_2 = value_or_none!("alpha2Code", country_data);
                         let zone = timezones.get(&alpha_2);
-                        vec.push(CountryData::new(
-                            country_name.to_string(),
-                            value_or_none!("capital", country_data),
-                            value_or_none!("region", country_data),
-                            alpha_2,
-                            value_or_none!("alpha3Code", country_data),
-                            timezone_vec(zone.cloned().unwrap_or_else(Vec::new).to_vec()),
-                            vec_or_none!("currencies", country_data, currencies),
-                            vec_or_none!("languages", country_data, languages),
-                            vec_or_none!("callingCodes", country_data),
-                        ));
+                        vec.push(
+                            CountryData::builder()
+                                .name(country_name.to_string())
+                                .capital(value_or_none!("capital", country_data))
+                                .region(value_or_none!("region", country_data))
+                                .alpha_2(alpha_2)
+                                .alpha_3(value_or_none!("alpha3Code", country_data))
+                                .timezones(timezone_vec(
+                                    zone.cloned().unwrap_or_else(Vec::new).to_vec(),
+                                ))
+                                .currencies(vec_or_none!("currencies", country_data, currencies))
+                                .languages(vec_or_none!("languages", country_data, languages))
+                                .call_codes(vec_or_none!("callingCodes", country_data))
+                                .build(),
+                        );
                     }
                 };
             }

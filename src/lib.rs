@@ -122,7 +122,7 @@ impl Country {
     /// ```
     #[cfg(feature = "from_capitals")]
     pub fn from_capital(capital: &str) -> Option<&'static [Self]> {
-        CAPTIAL.get(capital).map(|e| *e)
+        CAPTIAL.get(capital).copied()
     }
     /// Get a list of countries inside a region
     ///
@@ -136,7 +136,7 @@ impl Country {
     /// ```
     #[cfg(feature = "from_regions")]
     pub fn from_region(region: &str) -> Option<&'static [Self]> {
-        REGIONS.get(region).map(|e| *e)
+        REGIONS.get(region).copied()
     }
     /// Get the country from its ISO 3166-1 alpha_2 code
     ///
@@ -150,7 +150,7 @@ impl Country {
     /// ```
     #[cfg(feature = "from_alpha_2")]
     pub fn from_alpha_2(alpha_2: &str) -> Option<&'static [Self]> {
-        ALPHA_2.get(alpha_2).map(|e| *e)
+        ALPHA_2.get(alpha_2).copied()
     }
     /// Get the country from its ISO 3166-1 alpha_3 code
     ///
@@ -164,7 +164,7 @@ impl Country {
     /// ```
     #[cfg(feature = "from_alpha_3")]
     pub fn from_alpha_3(alpha_3: &str) -> Option<&'static [Self]> {
-        ALPHA_3.get(alpha_3).map(|e| *e)
+        ALPHA_3.get(alpha_3).copied()
     }
 }
 

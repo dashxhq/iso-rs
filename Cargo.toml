@@ -1,15 +1,15 @@
 [package]
 name = "iso-rs"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Daksh14 <41485688+Daksh14@users.noreply.github.com>"]
-edition = "2021"
+edition = "2024"
 build = "build/build.rs"
 description = "A crate to query ISO data, which includes countries, currencies, etc."
 license = "MIT"
 
 [dependencies]
 chrono = "0.4"
-chrono-tz = "0.9"
+chrono-tz = "0.10"
 phf = "0.11"
 
 [build-dependencies]
