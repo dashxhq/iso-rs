@@ -77,17 +77,28 @@ All tests live in `src/lib.rs`. Two kinds, both real:
 
 ## CI
 
-`.github/workflows/rust.yml` on push/PR to `main`: `cargo build`, `cargo test`,
-`cargo test --no-default-features`. No `fmt` or `clippy` gate.
+`.github/workflows/rust.yml` on push/PR to `main`, plus a weekly cron so new advisories
+surface without a push. Four jobs, all gating:
 
-Current baseline, so you can tell your changes apart from pre-existing noise:
+| Job | Runs |
+|---|---|
+| `test` | `cargo build`, `cargo test`, `cargo test --no-default-features` |
+| `lint` | `cargo fmt --all --check`, `cargo clippy --all-targets -- -D warnings` with and without default features |
+| `msrv` | `cargo +1.85 check --all-targets` |
+| `audit` | `cargo audit --deny warnings` |
 
-- `cargo fmt --check` reports diffs in `build/countries/mod.rs` and `build/time.rs`
-  (edition-2024 import ordering).
-- `cargo clippy` reports 3 `collapsible_if` warnings in the build script.
+There is no warning baseline — `fmt` and `clippy` are clean, so anything they report is
+yours. Two things that will trip you up:
 
-Fix these only if that is the task. Do not fold an unrelated repo-wide reformat into a
-behavioral change — it makes the diff unreviewable.
+- The MSRV job holds the build script to Rust 1.85. Let-chains (`if let ... && let ...`)
+  need 1.88, so take clippy's `collapsible_if` suggestion only if it doesn't use one —
+  `let ... else { continue }` collapses the same nesting and compiles on 1.85.
+- `--deny warnings` makes `cargo audit` fail on unmaintained crates, not just
+  vulnerabilities. To land a known-inapplicable advisory, add `--ignore RUSTSEC-…` to that
+  step with a comment saying why.
+
+Do not fold an unrelated repo-wide reformat into a behavioral change — it makes the diff
+unreviewable.
 
 ## Code style
 
