@@ -11,7 +11,7 @@ use crate::{
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use serde_json::{from_str, Value};
+use serde_json::{Value, from_str};
 use std::collections::HashMap;
 
 use std::error::Error;
@@ -34,35 +34,36 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
     let mut capitals: ItemsMap = HashMap::new();
     let mut alpha_2: ItemsMap = HashMap::new();
     let mut alpha_3: ItemsMap = HashMap::new();
-    if let Some(x) = parsed.as_array() {
-        for country in x.iter() {
-            if let Some(country_data) = country.as_object() {
-                let name = country_data.get("name");
-                if let Some(country_name) = name {
-                    if !vec.iter().any(|data| {
-                        data.name.trim_matches('\"') == country_name.to_string().trim_matches('\"')
-                    }) {
-                        let alpha_2 = value_or_none!("alpha2Code", country_data);
-                        let zone = timezones.get(&alpha_2);
-                        vec.push(
-                            CountryData::builder()
-                                .name(country_name.to_string())
-                                .capital(value_or_none!("capital", country_data))
-                                .region(value_or_none!("region", country_data))
-                                .alpha_2(alpha_2)
-                                .alpha_3(value_or_none!("alpha3Code", country_data))
-                                .timezones(timezone_vec(
-                                    zone.cloned().unwrap_or_else(Vec::new).to_vec(),
-                                ))
-                                .currencies(vec_or_none!("currencies", country_data, currencies))
-                                .languages(vec_or_none!("languages", country_data, languages))
-                                .call_codes(vec_or_none!("callingCodes", country_data))
-                                .build(),
-                        );
-                    }
-                };
-            }
+    for country in parsed.as_array().into_iter().flatten() {
+        let Some(country_data) = country.as_object() else {
+            continue;
+        };
+        let Some(country_name) = country_data.get("name") else {
+            continue;
+        };
+        if vec
+            .iter()
+            .any(|data| data.name.trim_matches('\"') == country_name.to_string().trim_matches('\"'))
+        {
+            continue;
         }
+        let alpha_2 = value_or_none!("alpha2Code", country_data);
+        let zone = timezones.get(&alpha_2);
+        vec.push(
+            CountryData::builder()
+                .name(country_name.to_string())
+                .capital(value_or_none!("capital", country_data))
+                .region(value_or_none!("region", country_data))
+                .alpha_2(alpha_2)
+                .alpha_3(value_or_none!("alpha3Code", country_data))
+                .timezones(timezone_vec(
+                    zone.cloned().unwrap_or_else(Vec::new).to_vec(),
+                ))
+                .currencies(vec_or_none!("currencies", country_data, currencies))
+                .languages(vec_or_none!("languages", country_data, languages))
+                .call_codes(vec_or_none!("callingCodes", country_data))
+                .build(),
+        );
     }
 
     for country_data in vec.iter() {
@@ -78,8 +79,6 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
             regions.entry(region).or_default().push(country.clone());
         }
 
-        map.name()
-            .entry(country_data.name.trim_matches('\"'), &country);
         alpha_2
             .entry(country_data.alpha_2.trim_matches('\"'))
             .or_default()
@@ -88,6 +87,8 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
             .entry(country_data.alpha_3.trim_matches('\"'))
             .or_default()
             .push(country.clone());
+        map.name()
+            .entry(country_data.name.trim_matches('\"'), country);
     }
 
     hash_map_to_static!(capitals, map, capital);

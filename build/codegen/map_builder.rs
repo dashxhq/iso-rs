@@ -4,11 +4,11 @@ use proc_macro2::{LexError, TokenStream};
 use std::str::FromStr;
 
 pub struct MapBuilder<'a> {
-    pub name: Map<&'a str>,
-    pub capital: Map<&'a str>,
-    pub region: Map<&'a str>,
-    pub alpha_2: Map<&'a str>,
-    pub alpha_3: Map<&'a str>,
+    pub name: Map<'a, &'a str>,
+    pub capital: Map<'a, &'a str>,
+    pub region: Map<'a, &'a str>,
+    pub alpha_2: Map<'a, &'a str>,
+    pub alpha_3: Map<'a, &'a str>,
 }
 
 pub struct ParsedMap {

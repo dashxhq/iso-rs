@@ -134,10 +134,8 @@ macro_rules! field_entry {
 #[macro_export]
 macro_rules! map_method {
     ( $function_name : ident ) => {
-        paste::item! {
-            pub fn [ < $function_name > ] ( &mut self ) -> &mut Map<&'a str> {
-                &mut self.$function_name
-            }
+        pub fn $function_name(&mut self) -> &mut Map<'a, &'a str> {
+            &mut self.$function_name
         }
     };
 }
@@ -147,7 +145,7 @@ macro_rules! map_method {
 macro_rules! hash_map_to_static {
     ( $hash_map : expr, $static_map : expr, $item : ident ) => {
         $hash_map.iter().for_each(|$item| {
-            $static_map.$item().entry($item.0, &vec_to_string($item.1));
+            $static_map.$item().entry($item.0, vec_to_string($item.1));
         });
     };
 }

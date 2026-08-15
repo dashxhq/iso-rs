@@ -9,7 +9,7 @@
 //!
 //! The crate allows you to query for country data by various fields.
 //! It pulls the data from the restcountries API and generates a compile-time
-//! static map using [phf-codegen](https://docs.rs/phf_codegen/0.8.0/phf_codegen/). The methods just query these maps.
+//! static map using [phf-codegen](https://docs.rs/phf_codegen/latest/phf_codegen/). The methods just query these maps.
 //! You can query countries by their name, capital (enable feature), etc.
 //!
 //! # Features
@@ -169,7 +169,7 @@ impl Country {
 }
 
 impl Timezone {
-    /// Get chrono_tz [timezone](https://docs.rs/chrono-tz/0.5.3/chrono_tz/enum.Tz.html)
+    /// Get chrono_tz [timezone](https://docs.rs/chrono-tz/latest/chrono_tz/enum.Tz.html)
     pub fn timezone(&self) -> Result<Tz, ParseError> {
         self.iana_identifier.parse()
     }
