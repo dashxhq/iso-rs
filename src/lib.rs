@@ -229,7 +229,7 @@ mod test {
         india_check!(india[0]);
     }
 
-    #[cfg(feature = "from_alpha_3")]
+    #[cfg(feature = "from_alpha_2")]
     #[test]
     fn basic_country_fetching_from_alpha_2() {
         let india = Country::from_alpha_2("IN").unwrap()[0];
