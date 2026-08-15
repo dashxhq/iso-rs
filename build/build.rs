@@ -12,20 +12,17 @@ mod macros;
 mod time;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    // Whole dir, not just this file: the JSON data files are codegen inputs too.
+    println!("cargo:rerun-if-changed=build");
+
     let path = Path::new(&env::var_os("OUT_DIR").unwrap()).join("codegen.rs");
     let mut file = BufWriter::new(File::create(&path).unwrap());
-
-    if std::env::var("DOCS_RS").is_ok() {
-        return Ok(());
-    }
 
     file.write_all(
         countries::get_countries(time::get_time()?)?
             .to_string()
             .as_bytes(),
     )?;
-
-    println!("cargo:rerun-if-changed=build/build.rs");
 
     Ok(())
 }
