@@ -1,2 +1,6 @@
 /target
 Cargo.lock
+
+# Local, uncommitted agent/editor config
+*.local.md
+settings.local.json
