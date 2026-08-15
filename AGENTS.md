@@ -37,8 +37,10 @@ Touching anything under `build/` forces a full rebuild and regenerates a ~760 KB
 | `build/codegen/mod.rs` | Emits Rust struct literals as **strings**. |
 | `build/codegen/map_builder.rs` | Wraps the five `phf_codegen::Map`s. |
 | `build/macros.rs` | `value_or_none!`, `vec_or_none!`, `field_entry!`, `tokens!`, etc. |
-| `build/countries.json` | Vendored [restcountries](https://gitlab.com/amatos/rest-countries) snapshot. |
-| `build/timezones.json` | Vendored timezonedb snapshot, keyed by `countryCode`. |
+| `build/countries.json` | Vendored [restcountries](https://gitlab.com/amatos/rest-countries) v2 snapshot. |
+| `build/timezones.json` | Vendored IANA `zone.tab`, keyed by `countryCode`. |
+| `scripts/update-countries.sh` | Refreshes `build/countries.json`. |
+| `scripts/update-timezones.sh` | Refreshes `build/timezones.json`. |
 
 `build/` is a separate compilation unit from `src/`. They share no code; `build/` items
 are reachable via `crate::` only from within the build script.
@@ -57,11 +59,38 @@ timezones.json ─┘                                                           
 
 The generated file defines `NAMES`, `CAPITALS`, `REGIONS`, `ALPHA_2`, `ALPHA_3`.
 
+## Refreshing the data
+
+```bash
+./scripts/update-countries.sh    # needs curl, jq
+./scripts/update-timezones.sh    # needs curl, jq, tar
+cargo test                       # regenerates codegen.rs and verifies
+```
+
+Both scripts fetch, validate, and only then replace the file, printing what changed.
+Neither needs an API key. Override the source with `COUNTRIES_URL` / `TZDATA_URL`.
+
+| File | Source |
+|---|---|
+| `countries.json` | `countriesV2.json` in the [restcountries repo](https://gitlab.com/amatos/rest-countries) — the hosted API is gone (`/v1`–`/v4` withdrawn, `/v5` needs a key), but the repo still carries the v2 file in the schema `countries/mod.rs` reads. |
+| `timezones.json` | IANA [`tzdata-latest.tar.gz`](https://data.iana.org/time-zones/), from `zone.tab`. Same upstream chrono-tz is generated from, so the two cannot drift. |
+
+The countries validation rejects the failure modes this build script is prone to:
+duplicate names (`get_countries` silently drops the later country), values containing
+the substring `null` (`field_entry!` rewrites it to `None` mid-value), and control
+characters (they reach the generated source verbatim and will not compile). If a check
+fires, fix the emitter rather than editing the data by hand.
+
+The 2021 snapshot put the subregion in `region` and the continent in `continent`;
+current files use `region` for the continent and add a separate `subregion`. 0.2.0
+follows the current schema, so `Country::region` is now `"Asia"` and the new
+`Country::subregion` is `"Southern Asia"`.
+
 ## Feature flags
 
-`from_capitals`, `from_alpha_2`, `from_alpha_3`, `from_regions` — all on by default via
-the `all` feature. Each gates *both* the generated static (in `countries/mod.rs`'s
-`quote!` block) and the query method (in `src/lib.rs`).
+`from_capitals`, `from_alpha_2`, `from_alpha_3`, `from_regions`, `from_subregions` — all
+on by default via the `all` feature. Each gates *both* the generated static (in
+`countries/mod.rs`'s `quote!` block) and the query method (in `src/lib.rs`).
 
 Adding a query method means adding `#[cfg(feature = "...")]` in **three** places: the
 static, the method, and the test. Then verify with `cargo test --no-default-features`.

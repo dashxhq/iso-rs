@@ -1,6 +1,6 @@
 [package]
 name = "iso-rs"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["Daksh14 <41485688+Daksh14@users.noreply.github.com>"]
 edition = "2024"
 build = "build/build.rs"
@@ -23,4 +23,11 @@ from_capitals = []
 from_alpha_2 = []
 from_alpha_3 = []
 from_regions = []
-all = ["from_capitals", "from_alpha_2", "from_alpha_3", "from_regions"]
+from_subregions = []
+all = [
+    "from_capitals",
+    "from_alpha_2",
+    "from_alpha_3",
+    "from_regions",
+    "from_subregions",
+]

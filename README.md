@@ -6,6 +6,7 @@ ISO-rs provides methods to query ISO country data. This includes
 - names
 - capitals
 - regions
+- subregions
 - alpha 2 codes
 - alpha 3 codes
 - timezones

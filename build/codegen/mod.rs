@@ -11,6 +11,7 @@ pub fn country_struct(country_data: &CountryData) -> String {
     let name = &country_data.name;
     let capital = &country_data.capital;
     let region = &country_data.region;
+    let subregion = &country_data.subregion;
     let alpha_2 = &country_data.alpha_2;
     let alpha_3 = &country_data.alpha_3;
     let timezones = vec_to_string(&country_data.timezones);
@@ -20,6 +21,7 @@ pub fn country_struct(country_data: &CountryData) -> String {
     field_entry!(struct_values, name);
     field_entry!(struct_values, Some(capital));
     field_entry!(struct_values, Some(region));
+    field_entry!(struct_values, Some(subregion));
     field_entry!(struct_values, alpha_2);
     field_entry!(struct_values, alpha_3);
     field_entry!(struct_values, timezones);

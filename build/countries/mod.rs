@@ -31,6 +31,7 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
     let mut map = MapBuilder::new();
     let mut vec: Vec<CountryData> = Vec::new();
     let mut regions: ItemsMap = HashMap::new();
+    let mut subregions: ItemsMap = HashMap::new();
     let mut capitals: ItemsMap = HashMap::new();
     let mut alpha_2: ItemsMap = HashMap::new();
     let mut alpha_3: ItemsMap = HashMap::new();
@@ -54,6 +55,7 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
                 .name(country_name.to_string())
                 .capital(value_or_none!("capital", country_data))
                 .region(value_or_none!("region", country_data))
+                .subregion(value_or_none!("subregion", country_data))
                 .alpha_2(alpha_2)
                 .alpha_3(value_or_none!("alpha3Code", country_data))
                 .timezones(timezone_vec(
@@ -71,12 +73,20 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
 
         let capital = country_data.capital.trim_matches('\"');
         let region = country_data.region.trim_matches('\"');
+        let subregion = country_data.subregion.trim_matches('\"');
         if !capital.is_empty() {
             capitals.entry(capital).or_default().push(country.clone());
         }
 
         if !region.is_empty() {
             regions.entry(region).or_default().push(country.clone());
+        }
+
+        if !subregion.is_empty() {
+            subregions
+                .entry(subregion)
+                .or_default()
+                .push(country.clone());
         }
 
         alpha_2
@@ -93,6 +103,7 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
 
     hash_map_to_static!(capitals, map, capital);
     hash_map_to_static!(regions, map, region);
+    hash_map_to_static!(subregions, map, subregion);
     hash_map_to_static!(alpha_2, map, alpha_2);
     hash_map_to_static!(alpha_3, map, alpha_3);
 
@@ -100,6 +111,7 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
     let names = parsed_map.name;
     let capital = parsed_map.capital;
     let regions = parsed_map.region;
+    let subregions = parsed_map.subregion;
     let alpha_2 = parsed_map.alpha_2;
     let alpha_3 = parsed_map.alpha_3;
 
@@ -112,6 +124,9 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
         #[cfg(feature = "from_regions")]
         /// Map of all regions with countries that reside in them.
         pub static REGIONS: phf::Map<&'static str, &'static [Country]> = #regions;
+        #[cfg(feature = "from_subregions")]
+        /// Map of all subregions with countries that reside in them.
+        pub static SUBREGIONS: phf::Map<&'static str, &'static [Country]> = #subregions;
         #[cfg(feature = "from_alpha_2")]
         /// Map of all alpha_2 codes (key) with the corresponding countries as values.
         pub static ALPHA_2: phf::Map<&'static str, &'static [Country]> = #alpha_2;

@@ -3,6 +3,7 @@ pub struct CountryData {
     pub name: String,
     pub capital: String,
     pub region: String,
+    pub subregion: String,
     pub alpha_2: String,
     pub alpha_3: String,
     pub timezones: Vec<String>,
@@ -22,6 +23,7 @@ pub struct CountryDataBuilder {
     name: String,
     capital: String,
     region: String,
+    subregion: String,
     alpha_2: String,
     alpha_3: String,
     timezones: Vec<String>,
@@ -43,6 +45,11 @@ impl CountryDataBuilder {
 
     pub fn region(mut self, region: String) -> Self {
         self.region = region;
+        self
+    }
+
+    pub fn subregion(mut self, subregion: String) -> Self {
+        self.subregion = subregion;
         self
     }
 
@@ -81,6 +88,7 @@ impl CountryDataBuilder {
             name: self.name,
             capital: self.capital,
             region: self.region,
+            subregion: self.subregion,
             alpha_2: self.alpha_2,
             alpha_3: self.alpha_3,
             timezones: self.timezones,

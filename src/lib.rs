@@ -18,6 +18,7 @@
 //! - `from_alpha_2`: Allows you to query country data by alpha_2 codes.
 //! - `from_alpha_3`: Allows you to query country data by alpha_3 codes.
 //! - `from_regions`: Allows you to query country data by their regions.
+//! - `from_subregions`: Allows you to query country data by their subregions.
 //!
 //! By default all these features are enabled. It is recommended to
 //! turn off the features you will not be using as the country data is
@@ -46,8 +47,10 @@ pub struct Country {
     pub name: &'static str,
     /// Name of the country's capital, eg. "Washington, DC".
     pub capital: Option<&'static str>,
-    /// [Region](https://gitlab.com/amatos/rest-countries#continent) of the country
+    /// Region of the country, eg. "Asia".
     pub region: Option<&'static str>,
+    /// Subregion of the country, eg. "Southern Asia".
+    pub subregion: Option<&'static str>,
     /// ISO 3166-1 2-letter country code
     pub alpha_2: &'static str,
     /// 3166-1 3-letter country code
@@ -131,12 +134,26 @@ impl Country {
     /// ```
     /// use iso_rs::prelude::*;
     ///
-    /// let southern_asia = Country::from_region("Southern Asia").unwrap();
-    /// assert!(southern_asia.contains(Country::from_name("India").unwrap()));
+    /// let asia = Country::from_region("Asia").unwrap();
+    /// assert!(asia.contains(Country::from_name("India").unwrap()));
     /// ```
     #[cfg(feature = "from_regions")]
     pub fn from_region(region: &str) -> Option<&'static [Self]> {
         REGIONS.get(region).copied()
+    }
+    /// Get a list of countries inside a subregion
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use iso_rs::prelude::*;
+    ///
+    /// let southern_asia = Country::from_subregion("Southern Asia").unwrap();
+    /// assert!(southern_asia.contains(Country::from_name("India").unwrap()));
+    /// ```
+    #[cfg(feature = "from_subregions")]
+    pub fn from_subregion(subregion: &str) -> Option<&'static [Self]> {
+        SUBREGIONS.get(subregion).copied()
     }
     /// Get the country from its ISO 3166-1 alpha_2 code
     ///
@@ -181,7 +198,8 @@ mod test {
 
     fn india_check(india: &Country) {
         assert_eq!(india.capital.unwrap(), "New Delhi");
-        assert_eq!(india.region.unwrap(), "Southern Asia");
+        assert_eq!(india.region.unwrap(), "Asia");
+        assert_eq!(india.subregion.unwrap(), "Southern Asia");
         assert_eq!(india.alpha_2, "IN");
         assert_eq!(india.alpha_3, "IND");
         assert_eq!(india.timezones[0].iana_identifier, "Asia/Kolkata");
@@ -244,7 +262,14 @@ mod test {
     #[cfg(feature = "from_regions")]
     #[test]
     fn basic_country_fetching_from_region() {
-        let southern_asia = Country::from_region("Southern Asia").unwrap();
+        let asia = Country::from_region("Asia").unwrap();
+        assert!(asia.contains(Country::from_name("India").unwrap()));
+    }
+
+    #[cfg(feature = "from_subregions")]
+    #[test]
+    fn basic_country_fetching_from_subregion() {
+        let southern_asia = Country::from_subregion("Southern Asia").unwrap();
         assert!(southern_asia.contains(Country::from_name("India").unwrap()));
     }
 }
