@@ -6,6 +6,12 @@ edition = "2024"
 build = "build/build.rs"
 description = "A crate to query ISO data, which includes countries, currencies, etc."
 license = "MIT"
+repository = "https://github.com/dashxhq/iso-rs"
+readme = "README.md"
+keywords = ["iso", "country", "currency", "iso3166", "timezone"]
+categories = ["internationalization", "data-structures"]
+rust-version = "1.85"
+exclude = ["AGENTS.md", "CLAUDE.md", ".github/", "scripts/"]
 
 [dependencies]
 chrono-tz = "0.10"
