@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 //! `iso-rs` crate provides methods to extract [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) (codes for country and dependent area names)
 //! [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639#Alpha-2_code_space) (Alpha-2 code), [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639#Alpha-3_code_space) (Alpha-3 code) (Codes for the representation of names of languages)
-//! codes, timezones, captials, regions, subregions, [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency codes, etc. for all countries.
+//! codes, timezones, capitals, regions, subregions, [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency codes, etc. for all countries.
 //!
 //! `iso-rs` crate is powered by the [REST Countries API](https://gitlab.com/amatos/rest-countries/)
 //! If you find this library useful and would like to show your gratitude, consider
@@ -122,7 +122,7 @@ impl Country {
     /// ```
     #[cfg(feature = "from_capitals")]
     pub fn from_capital(capital: &str) -> Option<&'static [Self]> {
-        CAPTIAL.get(capital).copied()
+        CAPITALS.get(capital).copied()
     }
     /// Get a list of countries inside a region
     ///
@@ -179,68 +179,66 @@ impl Timezone {
 mod test {
     use super::*;
 
-    macro_rules! india_check {
-        ( $india : expr ) => {
-            assert_eq!($india.capital.unwrap(), "New Delhi");
-            assert_eq!($india.region.unwrap(), "Southern Asia");
-            assert_eq!($india.alpha_2, "IN");
-            assert_eq!($india.alpha_3, "IND");
-            assert_eq!($india.timezones[0].iana_identifier, "Asia/Kolkata");
-            assert_eq!($india.call_codes[0], "91");
-            assert_eq!(
-                $india.currencies[0],
-                Currency {
-                    code: Some("INR"),
-                    name: Some("Indian rupee"),
-                    symbol: Some("₹"),
-                }
-            );
-            assert_eq!(
-                $india.languages[0],
-                Language {
-                    iso639_1: Some("hi"),
-                    iso639_2: Some("hin"),
-                    name: Some("Hindi"),
-                    native_name: Some("हिन्दी"),
-                }
-            );
-            assert_eq!(
-                $india.languages[1],
-                Language {
-                    iso639_1: Some("en"),
-                    iso639_2: Some("eng"),
-                    name: Some("English"),
-                    native_name: Some("English"),
-                }
-            );
-        };
+    fn india_check(india: &Country) {
+        assert_eq!(india.capital.unwrap(), "New Delhi");
+        assert_eq!(india.region.unwrap(), "Southern Asia");
+        assert_eq!(india.alpha_2, "IN");
+        assert_eq!(india.alpha_3, "IND");
+        assert_eq!(india.timezones[0].iana_identifier, "Asia/Kolkata");
+        assert_eq!(india.call_codes[0], "91");
+        assert_eq!(
+            india.currencies[0],
+            Currency {
+                code: Some("INR"),
+                name: Some("Indian rupee"),
+                symbol: Some("₹"),
+            }
+        );
+        assert_eq!(
+            india.languages[0],
+            Language {
+                iso639_1: Some("hi"),
+                iso639_2: Some("hin"),
+                name: Some("Hindi"),
+                native_name: Some("हिन्दी"),
+            }
+        );
+        assert_eq!(
+            india.languages[1],
+            Language {
+                iso639_1: Some("en"),
+                iso639_2: Some("eng"),
+                name: Some("English"),
+                native_name: Some("English"),
+            }
+        );
     }
 
     #[test]
     fn basic_country_fetching_from_name() {
         let india = Country::from_name("India").unwrap();
-        india_check!(india);
+        india_check(india);
     }
 
     #[cfg(feature = "from_capitals")]
     #[test]
     fn basic_country_fetching_from_capital() {
         let india = Country::from_capital("New Delhi").unwrap();
-        india_check!(india[0]);
+        india_check(&india[0]);
     }
 
     #[cfg(feature = "from_alpha_2")]
     #[test]
     fn basic_country_fetching_from_alpha_2() {
         let india = Country::from_alpha_2("IN").unwrap()[0];
-        india_check!(india);
+        india_check(&india);
     }
 
     #[cfg(feature = "from_alpha_3")]
     #[test]
     fn basic_country_fetching_from_alpha_3() {
         let india = Country::from_alpha_3("IND").unwrap()[0];
-        india_check!(india);
+        india_check(&india);
     }
 
     #[cfg(feature = "from_regions")]

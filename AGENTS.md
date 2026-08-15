@@ -55,7 +55,7 @@ timezones.json ─┘                                                           
                                                         src/lib.rs: include!(...) ───┘
 ```
 
-The generated file defines `NAMES`, `CAPTIAL`, `REGIONS`, `ALPHA_2`, `ALPHA_3`.
+The generated file defines `NAMES`, `CAPITALS`, `REGIONS`, `ALPHA_2`, `ALPHA_3`.
 
 ## Feature flags
 

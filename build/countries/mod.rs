@@ -107,7 +107,7 @@ pub fn get_countries(timezones: Timezones) -> Result<TokenStream, Box<dyn Error>
         pub static NAMES: phf::Map<&'static str, Country> = #names;
         #[cfg(feature = "from_capitals")]
         /// Map of all capitals with their countries as the value as an array of [`Country`](struct.Country.html).
-        pub static CAPTIAL: phf::Map<&'static str, &'static [Country]> = #capital;
+        pub static CAPITALS: phf::Map<&'static str, &'static [Country]> = #capital;
         #[cfg(feature = "from_regions")]
         /// Map of all regions with countries that reside in them.
         pub static REGIONS: phf::Map<&'static str, &'static [Country]> = #regions;
